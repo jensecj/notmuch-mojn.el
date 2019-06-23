@@ -13,6 +13,7 @@
 
 (require 'dash)
 (require 's)
+(require 'cl-lib)
 
 (require 'notmuch-mojn-core)
 (require 'notmuch-mojn-mute)
@@ -24,6 +25,26 @@
 
 ;;;; Core
 
+(defun notmuch-mojn-fetch-mail ()
+  "Calls `mbsync' to fetch new mail from the mailserver."
+  (interactive)
+  ;; TODO: make async, and show results in echo-area, ala. `mu4e'.
+  (message "notmuch: Fetching new mail.")
+  (message (s-trim (shell-command-to-string "mbsync -a")))
+  (jens/notmuch-refresh))
+
+(defun notmuch-mojn-delete-mail ()
+  "Delete the actual files on disk, for mail tagged with `deleted'."
+  (interactive)
+  (let* ((notmuch-cmd "search --output=files tag:DELETEME")
+         (cmd-result (notmuch/cmd notmuch-cmd))
+         (files (s-split "\n" cmd-result)))
+    (dolist (f files)
+      (when (and (f-exists-p f) (f-file-p f))
+        (message "deleting %s" f)
+        (f-delete f))
+      (notmuch-mojn-refresh))))
+
 (defun notmuch-mojn-update-entries ()
   (setq tabulated-list-entries nil)
   (let* ((data (notmuch-mojn--get-mail-data))
@@ -34,7 +55,7 @@
             (count (map-elt d :count ""))
             (unread (map-elt d :unread-count "")))
         (add-to-list 'tabulated-list-entries `(,idx [,key ,name ,(format "%s / %s" unread count)]))
-        (incf idx)))))
+        (cl-incf idx)))))
 
 (defun notmuch-mojn-visit-entry (entry)
   (when-let ((query (map-elt entry :query))
@@ -58,10 +79,11 @@
       (unless silent
         (message "%s" res))
       (run-hooks 'notmuch-mojn-refresh-hook)))
-  (notmuch-mojn-update-entries)
+  (when (eq major-mode 'notmuch-mojn-mode)
+    (notmuch-mojn-update-entries)
+    (revert-buffer))
   ;; (set-window-start (selected-window) (point-min)) ; because it moves down for some reason?
-  (notmuch-refresh-this-buffer)
-  (revert-buffer))
+  (notmuch-refresh-this-buffer))
 
 ;;;; The Mode
 
@@ -96,9 +118,10 @@
 
 (define-key notmuch-mojn-mode-map (kbd "j") #'notmuch-jump-search)
 (define-key notmuch-mojn-mode-map (kbd "s") #'notmuch-search)
+(define-key notmuch-mojn-mode-map (kbd "m") #'notmuch-mua-new-mail)
 
 (define-key notmuch-mojn-mode-map (kbd "g") #'notmuch-mojn-refresh)
-(define-key notmuch-mojn-mode-map (kbd "G") #'jens/notmuch-fetch-mail)
+(define-key notmuch-mojn-mode-map (kbd "G") #'notmuch-mojn-fetch-mail)
 
 
 (provide 'notmuch-mojn)
