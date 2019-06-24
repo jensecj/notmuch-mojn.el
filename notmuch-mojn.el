@@ -68,13 +68,14 @@
       (cl-incf idx))))
 
 (defun notmuch-mojn-visit-entry (entry)
-  (when-let ((query (map-elt entry :query))
-             (sort-order (map-elt entry :sort-order)))
+  (when-let ((is-blank (not (map-elt entry :blank)))
+             (query (map-elt entry :query))
+             (sort-order (map-elt entry :sort-order 'newest-first)))
     (notmuch-search query (not (eq sort-order 'newest-first)))))
 
 (defun notmuch-mojn-visit-entry-at-point ()
   (interactive)
-  (when-let* ((data (notmuch-mojn--get-mail-data))
+  (when-let* ((data (notmuch-mojn--get-saved-searches))
               (id (tabulated-list-get-id))
               (entry (nth id data)))
     (notmuch-mojn-visit-entry entry)))
