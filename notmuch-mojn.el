@@ -24,6 +24,10 @@
 (defvar notmuch-mojn-refresh-hook '(notmuch-mojn-mute-retag-messages)
   "Hooks to run after refreshing the notmuch database.")
 
+(defface notmuch-mojn-unread-face
+  '((t (:inherit notmuch-search-unread-face)))
+  "Face used for entries which have unread mails.")
+
 ;;;; Core
 
 (defun notmuch-mojn-fetch-mail ()
@@ -44,17 +48,24 @@
         (f-delete f))
       (notmuch-mojn-refresh))))
 
+(defun notmuch-mojn--build-list-entry (entry)
+  (if-let* ((is-blank (not (map-elt entry :blank)))
+            (name (map-elt entry :name ""))
+            (key (map-elt entry :key ""))
+            (count (map-elt entry :count 0))
+            (unread (map-elt entry :unread-count 0))
+            (mail-text (if (= 0 unread) (format "%s" count)
+                         (propertize (format "%s (%s)" count unread) 'face 'notmuch-mojn-unread-face))))
+      `[,key ,name ,mail-text]
+    `["" "" ""]))
+
 (defun notmuch-mojn-update-entries ()
   (setq tabulated-list-entries nil)
-  (let* ((data (notmuch-mojn--get-mail-data))
+  (let* ((data (notmuch-mojn--get-saved-searches))
          (idx 0))
     (dolist (d data)
-      (let ((key (map-elt d :key ""))
-            (name (map-elt d :name ""))
-            (count (map-elt d :count ""))
-            (unread (map-elt d :unread-count "")))
-        (add-to-list 'tabulated-list-entries `(,idx [,key ,name ,(format "%s / %s" unread count)]))
-        (cl-incf idx)))))
+      (add-to-list 'tabulated-list-entries `(,idx ,(notmuch-mojn--build-list-entry d)) t)
+      (cl-incf idx))))
 
 (defun notmuch-mojn-visit-entry (entry)
   (when-let ((query (map-elt entry :query))
