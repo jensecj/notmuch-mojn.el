@@ -49,6 +49,8 @@
       (notmuch-mojn-refresh))))
 
 (defun notmuch-mojn--build-list-entry (entry)
+  "Build a list entry for `tabulated-list-entries' from a
+saved-search entry."
   (if-let* ((is-blank (not (map-elt entry :blank)))
             (name (map-elt entry :name ""))
             (key (map-elt entry :key ""))
@@ -60,6 +62,8 @@
     `["" "" ""]))
 
 (defun notmuch-mojn-update-entries ()
+  "Update the `tabulated-list-entries' for mojn,
+recounting (un)read mail, etc."
   (setq tabulated-list-entries nil)
   (let* ((data (notmuch-mojn--get-saved-searches))
          (idx 0))
@@ -68,12 +72,14 @@
       (cl-incf idx))))
 
 (defun notmuch-mojn-visit-entry (entry)
+  "Visit a saved-search entry with `notmuch-search'."
   (when-let ((is-blank (not (map-elt entry :blank)))
              (query (map-elt entry :query))
              (sort-order (map-elt entry :sort-order 'newest-first)))
     (notmuch-search query (not (eq sort-order 'newest-first)))))
 
 (defun notmuch-mojn-visit-entry-at-point ()
+  "Visit the saved-search entry at point with `notmuch-search'."
   (interactive)
   (when-let* ((data (notmuch-mojn--get-saved-searches))
               (id (tabulated-list-get-id))
@@ -125,6 +131,7 @@
 
 ;;;###autoload
 (defun notmuch-mojn ()
+  "Open the `notmuch-mojn' mailbox."
   (interactive)
   (switch-to-buffer "*notmuch mojn*" nil)
   (notmuch-mojn-mode)

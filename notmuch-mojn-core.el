@@ -72,17 +72,18 @@ unread messages to the plist."
    queries))
 
 (defun notmuch-mojn--clean-saved-searches ()
-  ""
+  "Return saved searches, replace `:blank' lines with entries
+`notmuch' can understand."
   (-map-when
    (lambda (s) (map-elt s :blank))
    (lambda (s) (map-put! s :query "id:placeholder"))
    notmuch-saved-searches))
 
 (defun notmuch-mojn--get-saved-searches ()
+  "Return a list of saved searches (plists), augmented with the
+number of unread and total number of mails."
   (let* ((searches (notmuch-mojn--clean-saved-searches))
-         (data (notmuch-hello-query-counts
-                notmuch-saved-searches
-                :show-empty-searches t))
+         (data (notmuch-hello-query-counts searches :show-empty-searches t))
          (data (notmuch-mojn--count-unread data)))
     (-remove #'null data)))
 
