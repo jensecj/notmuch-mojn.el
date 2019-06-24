@@ -78,20 +78,26 @@ recounting (un)read mail, etc."
       (add-to-list 'tabulated-list-entries `(,idx ,(notmuch-mojn--build-list-entry d)) t)
       (cl-incf idx))))
 
-(defun notmuch-mojn-visit-entry (entry)
+(defun notmuch-mojn-search-entry (entry &optional tree)
   "Visit a saved-search entry with `notmuch-search'."
   (when-let ((is-blank (not (map-elt entry :blank)))
              (query (map-elt entry :query))
              (sort-order (map-elt entry :sort-order 'newest-first)))
-    (notmuch-search query (not (eq sort-order 'newest-first)))))
+    (if tree
+        (notmuch-tree query)
+      (notmuch-search query (not (eq sort-order 'newest-first))))))
 
-(defun notmuch-mojn-visit-entry-at-point ()
+(defun notmuch-mojn-search-entry-at-point (&optional tree)
   "Visit the saved-search entry at point with `notmuch-search'."
   (interactive)
   (when-let* ((data (notmuch-mojn--get-saved-searches))
               (id (tabulated-list-get-id))
               (entry (nth id data)))
-    (notmuch-mojn-visit-entry entry)))
+    (notmuch-mojn-search-entry entry tree)))
+
+(defun notmuch-mojn-tree-entry-at-point ()
+  (interactive)
+  (notmuch-mojn-search-entry-at-point 'tree))
 
 (defun notmuch-mojn-refresh (&optional silent)
   "Calls `notmuch' to refresh the mailbox."
@@ -118,7 +124,8 @@ recounting (un)read mail, etc."
     (define-key map (kbd "s") #'notmuch-search)
     (define-key map (kbd "m") #'notmuch-mua-new-mail)
     ;; mojn specific keys
-    (define-key map (kbd "<return>") #'notmuch-mojn-visit-entry-at-point)
+    (define-key map (kbd "<return>") #'notmuch-mojn-search-entry-at-point)
+    (define-key map (kbd "z") #'notmuch-mojn-tree-entry-at-point)
     (define-key map (kbd "g") #'notmuch-mojn-refresh)
     (define-key map (kbd "G") #'notmuch-mojn-fetch-mail)
     (define-key map (kbd "D") #'notmuch-mojn-delete-mail)
