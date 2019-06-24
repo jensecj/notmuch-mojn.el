@@ -37,9 +37,7 @@
 (defun notmuch-mojn-delete-mail ()
   "Delete the actual files on disk, for mail tagged with `deleted'."
   (interactive)
-  (let* ((notmuch-cmd "search --output=files tag:DELETEME")
-         (cmd-result (notmuch/cmd notmuch-cmd))
-         (files (s-split "\n" cmd-result)))
+  (let* ((files (notmuch/get-mail-files-with-tag "deleted")))
     (dolist (f files)
       (when (and (f-exists-p f) (f-file-p f))
         (message "deleting %s" f)
