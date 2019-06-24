@@ -102,14 +102,14 @@
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map tabulated-list-mode-map)
     ;; keys to replicate `notmuch-hello' behaviour
-    (define-key notmuch-mojn-mode-map (kbd "j") #'notmuch-jump-search)
-    (define-key notmuch-mojn-mode-map (kbd "s") #'notmuch-search)
-    (define-key notmuch-mojn-mode-map (kbd "m") #'notmuch-mua-new-mail)
+    (define-key map (kbd "j") #'notmuch-jump-search)
+    (define-key map (kbd "s") #'notmuch-search)
+    (define-key map (kbd "m") #'notmuch-mua-new-mail)
     ;; mojn specific keys
-    (define-key notmuch-mojn-mode-map (kbd "<return>") #'notmuch-mojn-visit-entry-at-point)
-    (define-key notmuch-mojn-mode-map (kbd "g") #'notmuch-mojn-refresh)
-    (define-key notmuch-mojn-mode-map (kbd "G") #'notmuch-mojn-fetch-mail)
-    (define-key notmuch-mojn-mode-map (kbd "D") #'notmuch-mojn-delete-mail)
+    (define-key map (kbd "<return>") #'notmuch-mojn-visit-entry-at-point)
+    (define-key map (kbd "g") #'notmuch-mojn-refresh)
+    (define-key map (kbd "G") #'notmuch-mojn-fetch-mail)
+    (define-key map (kbd "D") #'notmuch-mojn-delete-mail)
     map)
   "Local keymap for `notmuch-mojn-mode' buffers.")
 
