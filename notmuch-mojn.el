@@ -60,7 +60,6 @@
 
 (defun notmuch-mojn-visit-entry (entry)
   (when-let ((query (map-elt entry :query))
-             (name (map-elt entry :name))
              (sort-order (map-elt entry :sort-order)))
     (notmuch-search query (not (eq sort-order 'newest-first)))))
 
