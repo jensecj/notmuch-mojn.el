@@ -18,14 +18,12 @@
 
 (defun notmuch-mojn-mute--get-muted-threads ()
   "Return a list of ids for all muted threads."
-  (let ((cmd "search --output=threads tag:muted"))
-    (notmuch/cmd* cmd)))
+  (notmuch/get-threads-by-tag "muted"))
 
 (defun notmuch-mojn-mute--get-unmuted-messages (thread)
   "Return a list of id for all messages that belong to THREAD,
 and do not have the +muted tag."
-  (let ((cmd (format "search --output=messages %s and not tag:muted" thread)))
-    (notmuch/cmd* cmd)))
+  (notmuch/search (format "%s and not tag:muted" thread) 'messages))
 
 (defun notmuch-mojn-mute-retag-messages ()
   "If there exist messages which belong to a thread which has
