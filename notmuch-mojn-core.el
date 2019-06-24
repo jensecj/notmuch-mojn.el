@@ -14,6 +14,18 @@
 (require 'dash)
 (require 's)
 
+;;;; Settings
+
+(defvar notmuch-mojn-completing-read-function #'completing-read
+  "Function used for completing reads.")
+
+(defvar notmuch-mojn-candidate-functions '()
+  "List of function to call which supply additional candidates
+  for address completion.
+
+The function is called with no arguments, and should return a
+list of strings.")
+
 ;;;; Building blocks
 
 (defun notmuch/cmd (cmd)
@@ -87,5 +99,25 @@ number of unread and total number of mails."
          (data (notmuch-mojn--count-unread data)))
     (-remove #'null data)))
 
+;;;; Address completion
+
+(defun notmuch-mojn--mail-candidates-notmuch ()
+  "Return list of mail addresses from mails in the notmuch database."
+  (unless notmuch-address-completions
+    (notmuch-address-harvest nil t))
+
+  (ht-keys notmuch-address-completions))
+
+(defun notmuch-mojn-complete-address ()
+  "Complete mail addresses using the senders/receivers harvested
+by notmuch, and any additional mails collected from
+`notmuch-mojn-candidate-functions'."
+  (interactive)
+  (let* ((notmuch-candidates (notmuch-mojn--mail-candidates-notmuch))
+         (other-candidates (-mapcat #'funcall notmuch-mojn-candidate-functions))
+         (candidates (remove-duplicates
+                      (-concat notmuch-candidates other-candidates)
+                      :test #'string=)))
+    (insert (funcall notmuch-mojn-completing-read-function "Candidates: " candidates))))
 
 (provide 'notmuch-mojn-core)
