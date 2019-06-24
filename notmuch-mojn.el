@@ -14,6 +14,7 @@
 (require 'dash)
 (require 's)
 (require 'cl-lib)
+(require 'tabulated-list)
 
 (require 'notmuch-mojn-core)
 (require 'notmuch-mojn-mute)
