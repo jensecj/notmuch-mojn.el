@@ -113,16 +113,14 @@
     map)
   "Local keymap for `notmuch-mojn-mode' buffers.")
 
-(define-derived-mode notmuch-mojn-mode tabulated-list-mode "notmuch-mojn"
+(define-derived-mode notmuch-mojn-mode
+  tabulated-list-mode "notmuch-mojn"
   "Notmuch hello variant, based on `tabulated-list-mode'."
-  (setq tabulated-list-format [("Key" 5 t)
-                               ("Name" 15 t)
+  (setq tabulated-list-format [("Key" 5 nil)
+                               ("Name" 15 nil)
                                ("Mail" 15 nil)])
   (setq tabulated-list-padding 2)
-  (setq tabulated-list-sort-key '("Name" . t))
-  (setq tabulated-list--header-string " ")
-  (setq header-line-format " ")
-
+  (setq tabulated-list-sort-key nil)
   (tabulated-list-init-header))
 
 ;;;###autoload
@@ -133,12 +131,7 @@
 
   (notmuch-mojn-refresh)
 
-  ;; (setq tabulated-list-entries '((1 ["i"  "inbox"    "2 / 12"]) (2 ["a"  "all mail" "3 / 50"])))
-
   (tabulated-list-print t)
   (goto-char (point-min)))
-
-;;;; Keybindings
-
 
 (provide 'notmuch-mojn)
