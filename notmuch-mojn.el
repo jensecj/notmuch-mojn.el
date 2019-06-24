@@ -122,7 +122,7 @@
   (switch-to-buffer "*notmuch mojn*" nil)
   (notmuch-mojn-mode)
 
-  (notmuch-mojn-update-entries)
+  (notmuch-mojn-refresh)
 
   ;; (setq tabulated-list-entries '((1 ["i"  "inbox"    "2 / 12"]) (2 ["a"  "all mail" "3 / 50"])))
 
