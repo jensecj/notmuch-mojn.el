@@ -21,7 +21,10 @@
 
 ;;;; Settings / Vars
 
-(defvar notmuch-mojn-refresh-hook '(notmuch-mojn-mute-retag-messages)
+(defvar notmuch-mojn-pre-refresh-hook '()
+  "Hooks to run before refreshing the notmuch database.")
+
+(defvar notmuch-mojn-post-refresh-hook '(notmuch-mojn-mute-retag-messages)
   "Hooks to run after refreshing the notmuch database.")
 
 (defface notmuch-mojn-unread-face
@@ -111,15 +114,18 @@ recounting (un)read mail, etc."
   (interactive)
   (message "refreshing notmuch...")
 
+  (run-hooks 'notmuch-mojn-pre-refresh-hook)
+
   (unless (process-live-p (get-process "notmuch-new"))
     (let ((res (notmuch/cmd "new")))
       (unless silent
         (message "%s" res))))
 
   (when (eq major-mode 'notmuch-mojn-mode)
-    (run-hooks 'notmuch-mojn-refresh-hook)
     (notmuch-mojn-update-entries)
     (revert-buffer))
+
+  (run-hooks 'notmuch-mojn-post-refresh-hook)
 
   (notmuch-refresh-this-buffer))
 
