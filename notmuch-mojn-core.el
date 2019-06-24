@@ -72,11 +72,20 @@ unread messages to the plist."
                    (string-to-number (notmuch/cmd unread-query))))))
    queries))
 
-(defun notmuch-mojn--get-mail-data ()
-  (let* ((data (notmuch-hello-query-counts
+(defun notmuch-mojn--clean-saved-searches ()
+  ""
+  (-map-when
+   (lambda (s) (map-elt s :blank))
+   (lambda (s) (map-put! s :query "id:placeholder"))
+   notmuch-saved-searches))
+
+(defun notmuch-mojn--get-saved-searches ()
+  (let* ((searches (notmuch-mojn--clean-saved-searches))
+         (data (notmuch-hello-query-counts
                 notmuch-saved-searches
-                :show-empty-searches notmuch-show-empty-saved-searches))
+                :show-empty-searches t))
          (data (notmuch-mojn--count-unread data)))
-    data))
+    (-remove #'null data)))
+
 
 (provide 'notmuch-mojn-core)
