@@ -71,8 +71,9 @@ list of strings.")
   "Return a list of message-ids for messages with TAG."
   (notmuch/get-messages (format "tag:%s" tag)))
 
+;;;; Utility
 
-(defun notmuch-mojn--count-unread (queries)
+(defun notmuch-mojn--append-unread (queries)
   "Like `notmuch-hello-query-counts', but add the count of
 unread messages to the plist."
   (-map
@@ -96,7 +97,7 @@ unread messages to the plist."
 number of unread and total number of mails."
   (let* ((searches (notmuch-mojn--clean-saved-searches))
          (data (notmuch-hello-query-counts searches :show-empty-searches t))
-         (data (notmuch-mojn--count-unread data)))
+         (data (notmuch-mojn--append-unread data)))
     (-remove #'null data)))
 
 ;;;; Address completion

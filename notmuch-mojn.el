@@ -28,6 +28,9 @@
   '((t (:inherit notmuch-search-unread-face)))
   "Face used for entries which have unread mails.")
 
+(defvar notmuch-mojn-really-delete-mail nil
+  "Whether to really delete email when calling `notmuch-mojn-delete-mail'.")
+
 ;;;; Core
 
 (defun notmuch-mojn-fetch-mail ()
@@ -41,12 +44,16 @@
 (defun notmuch-mojn-delete-mail ()
   "Delete the actual files on disk, for mail tagged with `deleted'."
   (interactive)
-  (let* ((files (notmuch/get-mail-files-with-tag "deleted")))
-    (dolist (f files)
-      (when (and (f-exists-p f) (f-file-p f))
-        (message "deleting %s" f)
-        (f-delete f))
-      (notmuch-mojn-refresh))))
+  (if notmuch-mojn-really-delete-mail
+      (let* ((files (notmuch/get-files "tag:DELETEME")))
+        (dolist (f files)
+          (when (and (f-exists-p f) (f-file-p f))
+            (message "deleting %s" f)
+            (f-delete f)))
+        (notmuch-mojn-refresh))
+    (message "To delete mail, you need to set `notmuch-mojn-really-delete-mail' to `t'")))
+
+;;;; UI
 
 (defun notmuch-mojn--build-list-entry (entry)
   "Build a list entry for `tabulated-list-entries' from a
@@ -102,7 +109,6 @@ recounting (un)read mail, etc."
   (notmuch-refresh-this-buffer))
 
 ;;;; The Mode
-;; https://gitlab.com/ambrevar/emacs-disk-usage/blob/master/disk-usage.el
 
 (defvar notmuch-mojn-mode-map
   (let ((map (make-sparse-keymap)))
