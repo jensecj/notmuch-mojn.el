@@ -87,6 +87,22 @@
   (notmuch-refresh-this-buffer))
 
 ;;;; The Mode
+;; https://gitlab.com/ambrevar/emacs-disk-usage/blob/master/disk-usage.el
+
+(defvar notmuch-mojn-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map tabulated-list-mode-map)
+    ;; keys to replicate `notmuch-hello' behaviour
+    (define-key notmuch-mojn-mode-map (kbd "j") #'notmuch-jump-search)
+    (define-key notmuch-mojn-mode-map (kbd "s") #'notmuch-search)
+    (define-key notmuch-mojn-mode-map (kbd "m") #'notmuch-mua-new-mail)
+    ;; mojn specific keys
+    (define-key notmuch-mojn-mode-map (kbd "<return>") #'notmuch-mojn-visit-entry-at-point)
+    (define-key notmuch-mojn-mode-map (kbd "g") #'notmuch-mojn-refresh)
+    (define-key notmuch-mojn-mode-map (kbd "G") #'notmuch-mojn-fetch-mail)
+    (define-key notmuch-mojn-mode-map (kbd "D") #'notmuch-mojn-delete-mail)
+    map)
+  "Local keymap for `notmuch-mojn-mode' buffers.")
 
 (define-derived-mode notmuch-mojn-mode tabulated-list-mode "notmuch-mojn"
   "Notmuch hello variant, based on `tabulated-list-mode'."
@@ -114,15 +130,6 @@
   (goto-char (point-min)))
 
 ;;;; Keybindings
-
-(define-key notmuch-mojn-mode-map (kbd "<return>") #'notmuch-mojn-visit-entry-at-point)
-
-(define-key notmuch-mojn-mode-map (kbd "j") #'notmuch-jump-search)
-(define-key notmuch-mojn-mode-map (kbd "s") #'notmuch-search)
-(define-key notmuch-mojn-mode-map (kbd "m") #'notmuch-mua-new-mail)
-
-(define-key notmuch-mojn-mode-map (kbd "g") #'notmuch-mojn-refresh)
-(define-key notmuch-mojn-mode-map (kbd "G") #'notmuch-mojn-fetch-mail)
 
 
 (provide 'notmuch-mojn)
