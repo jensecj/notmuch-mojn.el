@@ -31,15 +31,22 @@
 (defvar notmuch-mojn-really-delete-mail nil
   "Whether to really delete email when calling `notmuch-mojn-delete-mail'.")
 
+(defvar notmuch-mojn-fetch-function #'notmuch-mojn--mbsync-fetch-mail
+  "Function to use to fetch new mail.")
+
 ;;;; Core
+
+(defun notmuch-mojn--mbsync-fetch-mail ()
+  "Fetch new mail using mbsync."
+  (message "notmuch-mojn: Fetching new mail.")
+  (message (s-trim (shell-command-to-string "mbsync -a"))))
 
 (defun notmuch-mojn-fetch-mail ()
   "Calls `mbsync' to fetch new mail from the mailserver."
   (interactive)
   ;; TODO: make async, and show results in echo-area, ala. `mu4e'.
-  (message "notmuch: Fetching new mail.")
-  (message (s-trim (shell-command-to-string "mbsync -a")))
-  (jens/notmuch-refresh))
+  (funcall notmuch-mojn-fetch-function)
+  (notmuch-mojn-refresh))
 
 (defun notmuch-mojn-delete-mail ()
   "Delete the actual files on disk, for mail tagged with `deleted'."
@@ -103,15 +110,17 @@ recounting (un)read mail, etc."
   "Calls `notmuch' to refresh the mailbox."
   (interactive)
   (message "refreshing notmuch...")
+
   (unless (process-live-p (get-process "notmuch-new"))
     (let ((res (notmuch/cmd "new")))
       (unless silent
-        (message "%s" res))
-      (run-hooks 'notmuch-mojn-refresh-hook)))
+        (message "%s" res))))
+
   (when (eq major-mode 'notmuch-mojn-mode)
+    (run-hooks 'notmuch-mojn-refresh-hook)
     (notmuch-mojn-update-entries)
     (revert-buffer))
-  ;; (set-window-start (selected-window) (point-min)) ; because it moves down for some reason?
+
   (notmuch-refresh-this-buffer))
 
 ;;;; The Mode
