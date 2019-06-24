@@ -67,9 +67,8 @@ unread messages to the plist."
    (lambda (e)
      (let* ((query (map-elt e :query))
             (unread-query (format "count %s and tag:unread" query)))
-       (unless (s-contains-p "tag:unread" query)
-         (map-put! e :unread-count
-                   (string-to-number (notmuch/cmd unread-query))))))
+       (map-put! e :unread-count
+                 (string-to-number (notmuch/cmd unread-query)))))
    queries))
 
 (defun notmuch-mojn--clean-saved-searches ()
