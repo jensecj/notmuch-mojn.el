@@ -109,10 +109,17 @@ recounting (un)read mail, etc."
   (interactive)
   (notmuch-mojn-search-entry-at-point 'tree))
 
+(defun notmuch-mojn-revert-buffer ()
+  "Rebuild the buffer, updating entries if something has changed"
+  (interactive)
+  (notmuch-mojn-update-entries)
+  (notmuch-refresh-this-buffer)
+  (revert-buffer))
+
 (defun notmuch-mojn-refresh (&optional silent)
   "Calls `notmuch' to refresh the mailbox."
   (interactive)
-  (message "refreshing notmuch...")
+  (message "refreshing notmuch database...")
 
   (run-hooks 'notmuch-mojn-pre-refresh-hook)
 
@@ -121,13 +128,9 @@ recounting (un)read mail, etc."
       (unless silent
         (message "%s" res))))
 
-  (when (eq major-mode 'notmuch-mojn-mode)
-    (notmuch-mojn-update-entries)
-    (revert-buffer))
-
   (run-hooks 'notmuch-mojn-post-refresh-hook)
 
-  (notmuch-refresh-this-buffer))
+  (notmuch-mojn-revert-buffer))
 
 ;;;; The Mode
 
@@ -141,7 +144,8 @@ recounting (un)read mail, etc."
     ;; mojn specific keys
     (define-key map (kbd "<return>") #'notmuch-mojn-search-entry-at-point)
     (define-key map (kbd "z") #'notmuch-mojn-tree-entry-at-point)
-    (define-key map (kbd "g") #'notmuch-mojn-refresh)
+    (define-key map (kbd "g") #'notmuch-mojn-revert-buffer)
+    (define-key map (kbd "u") #'notmuch-mojn-refresh)
     (define-key map (kbd "G") #'notmuch-mojn-fetch-mail)
     (define-key map (kbd "D") #'notmuch-mojn-delete-mail)
     map)
@@ -164,7 +168,7 @@ recounting (un)read mail, etc."
   (switch-to-buffer "*notmuch mojn*" nil)
   (notmuch-mojn-mode)
 
-  (notmuch-mojn-refresh)
+  (notmuch-mojn-revert-buffer)
 
   (tabulated-list-print t)
   (goto-char (point-min)))
