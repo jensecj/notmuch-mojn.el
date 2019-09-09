@@ -112,9 +112,13 @@ recounting (un)read mail, etc."
 (defun notmuch-mojn-revert-buffer ()
   "Rebuild the buffer, updating entries if something has changed"
   (interactive)
-  (notmuch-mojn-update-entries)
-  (notmuch-refresh-this-buffer)
-  (revert-buffer))
+  (when-let* ((buf (current-buffer))
+              (name (buffer-name buf))
+              (guard (s-starts-with-p "*notmuch" name)))
+    (notmuch-mojn-update-entries)
+    (notmuch-refresh-this-buffer)
+    (ignore-errors
+      (revert-buffer))))
 
 (defun notmuch-mojn-refresh (&optional silent)
   "Calls `notmuch' to refresh the mailbox."
