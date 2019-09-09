@@ -92,7 +92,7 @@ unread messages to the plist."
    (lambda (s) (map-put! s :query "id:placeholder"))
    notmuch-saved-searches))
 
-(defun notmuch-mojn--get-saved-searches ()
+(defun notmuch-mojn-get-saved-searches ()
   "Return a list of saved searches (plists), augmented with the
 number of unread and total number of mails."
   (let* ((searches (notmuch-mojn--clean-saved-searches))

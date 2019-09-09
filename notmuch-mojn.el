@@ -82,7 +82,7 @@ saved-search entry."
   "Update the `tabulated-list-entries' for mojn,
 recounting (un)read mail, etc."
   (setq tabulated-list-entries nil)
-  (let* ((data (notmuch-mojn--get-saved-searches))
+  (let* ((data (notmuch-mojn-get-saved-searches))
          (idx 0))
     (dolist (d data)
       (add-to-list 'tabulated-list-entries `(,idx ,(notmuch-mojn--build-list-entry d)) t)
@@ -100,7 +100,7 @@ recounting (un)read mail, etc."
 (defun notmuch-mojn-search-entry-at-point (&optional tree)
   "Visit the saved-search entry at point with `notmuch-search'."
   (interactive)
-  (when-let* ((data (notmuch-mojn--get-saved-searches))
+  (when-let* ((data (notmuch-mojn-get-saved-searches))
               (id (tabulated-list-get-id))
               (entry (nth id data)))
     (notmuch-mojn-search-entry entry tree)))
