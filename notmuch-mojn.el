@@ -4,7 +4,7 @@
 
 ;; Author: Jens Christian Jensen <jensecj@gmail.com>
 ;; Keywords:
-;; Package-Version: 20190623
+;; Package-Version: 20190909
 ;; Version: 0.1
 
 ;;; Commentary:
