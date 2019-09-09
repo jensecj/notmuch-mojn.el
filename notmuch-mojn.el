@@ -106,6 +106,7 @@ recounting (un)read mail, etc."
     (notmuch-mojn-search-entry entry tree)))
 
 (defun notmuch-mojn-tree-entry-at-point ()
+  "Visit the entry at point in tree view."
   (interactive)
   (notmuch-mojn-search-entry-at-point 'tree))
 
@@ -158,9 +159,7 @@ recounting (un)read mail, etc."
 (define-derived-mode notmuch-mojn-mode
   tabulated-list-mode "notmuch-mojn"
   "Notmuch hello variant, based on `tabulated-list-mode'."
-  (setq tabulated-list-format [("Key" 5 nil)
-                               ("Name" 15 nil)
-                               ("Mail" 15 nil)])
+  (setq tabulated-list-format [("Key" 5 nil) ("Name" 15 nil) ("Mail" 15 nil)])
   (setq tabulated-list-padding 2)
   (setq tabulated-list-sort-key nil)
   (tabulated-list-init-header))
