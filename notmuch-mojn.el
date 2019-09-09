@@ -55,7 +55,7 @@
   "Delete the actual files on disk, for mail tagged with `deleted'."
   (interactive)
   (if notmuch-mojn-really-delete-mail
-      (let* ((files (notmuch/get-files "tag:DELETEME")))
+      (let* ((files (notmuch/get-files "tag:deleted")))
         (dolist (f files)
           (when (and (f-exists-p f) (f-file-p f))
             (message "deleting %s" f)
