@@ -27,6 +27,12 @@
 (defvar notmuch-mojn-post-refresh-hook '(notmuch-mojn-mute-retag-messages)
   "Hooks to run after refreshing the notmuch database.")
 
+(defvar notmuch-mojn-pre-fetch-hook '()
+  "Hooks to run before fetching new mail.")
+
+(defvar notmuch-mojn-post-fetch-hook '()
+  "Hooks to run after fetching new mail.")
+
 (defface notmuch-mojn-unread-face
   '((t (:inherit notmuch-search-unread-face)))
   "Face used for entries which have unread mails.")
@@ -47,8 +53,9 @@
 (defun notmuch-mojn-fetch-mail ()
   "Calls `mbsync' to fetch new mail from the mailserver."
   (interactive)
-  ;; TODO: make async, and show results in echo-area, ala. `mu4e'.
+  (run-hooks 'notmuch-mojn-pre-fetch-hook)
   (funcall notmuch-mojn-fetch-function)
+  (run-hooks 'notmuch-mojn-post-fetch-hook)
   (notmuch-mojn-refresh))
 
 (defun notmuch-mojn-delete-mail ()
