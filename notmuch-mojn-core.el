@@ -1,16 +1,5 @@
 ;;; notmuch-mojn-core.el. --- -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019 Jens Christian Jensen
-
-;; Author: Jens Christian Jensen <jensecj@gmail.com>
-;; Keywords:
-;; Package-Version: 20190623
-;; Version: 0.1
-
-;;; Commentary:
-
-;;; Code:
-
 (require 'dash)
 (require 's)
 
@@ -84,6 +73,7 @@ unread messages to the plist."
                  (string-to-number (notmuch/cmd unread-query)))))
    queries))
 
+;; HACK: find another way to do this
 (defun notmuch-mojn--clean-saved-searches ()
   "Return saved searches, replace `:blank' lines with entries
 `notmuch' can understand."

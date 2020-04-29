@@ -1,20 +1,11 @@
 ;;; notmuch-mojn-mute.el. --- -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019 Jens Christian Jensen
-
-;; Author: Jens Christian Jensen <jensecj@gmail.com>
-;; Keywords:
-;; Package-Version: 20190623
-;; Version: 0.1
-
-;;; Commentary:
-
-;;; Code:
-
 (require 'dash)
 (require 's)
 
 (require 'notmuch-mojn-core)
+
+;; TODO: don't do this in emacs, do it in post-new hook
 
 (defun notmuch-mojn-mute--get-muted-threads ()
   "Return a list of ids for all muted threads."
