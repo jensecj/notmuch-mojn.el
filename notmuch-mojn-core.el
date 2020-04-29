@@ -102,6 +102,12 @@ number of unread and total number of mails."
 
 ;;;; Address completion
 
+(defun notmuch-mojn--candidate-at-point ()
+  "Return the candidate at point, and its bounds."
+  (interactive)
+  (cons (thing-at-point 'sexp t)
+        (bounds-of-thing-at-point 'sexp)))
+
 (defun notmuch-mojn--mail-candidates-notmuch ()
   "Return list of mail addresses from mails in the notmuch database."
   (unless notmuch-address-completions
@@ -118,7 +124,14 @@ by notmuch, and any additional mails collected from
          (other-candidates (-mapcat #'funcall notmuch-mojn-candidate-functions))
          (candidates (remove-duplicates
                       (-concat notmuch-candidates other-candidates)
-                      :test #'string=)))
-    (insert (funcall notmuch-mojn-completing-read-function "Candidates: " candidates))))
+                      :test #'string=))
+         (cand (notmuch-mojn--candidate-at-point))
+         (cand-bounds (cdr cand))
+         ;; FIXME: figure an API for the completing-read functions, create shims for common ones
+         (pick (funcall notmuch-mojn-completing-read-function "Candidates: " candidates nil t cand)))
+    (when cand-bounds
+      (delete-region (car cand-bounds) (cdr cand-bounds))
+      (goto-char (car cand-bounds)))
+    (insert pick)))
 
 (provide 'notmuch-mojn-core)
