@@ -48,7 +48,9 @@
 (defun notmuch-mojn--mbsync-fetch-mail ()
   "Fetch new mail using mbsync."
   (message "notmuch-mojn: Fetching new mail.")
-  (message (s-trim (shell-command-to-string "mbsync -a"))))
+  (let ((buf (get-buffer-create "*notmuch-mojn-fetch-mail*")))
+    (start-process "notmuch-mojn-fetch-mail" buf "mbsync" "-V" "-a")
+    (view-buffer-other-window buf nil #'kill-buffer)))
 
 (defun notmuch-mojn-fetch-mail ()
   "Calls `mbsync' to fetch new mail from the mailserver."
