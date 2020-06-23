@@ -50,18 +50,27 @@
 
 (defun notmuch-mojn--mbsync-fetch-mail ()
   "Fetch new mail using mbsync."
-  (message "notmuch-mojn: Fetching new mail.")
   (let ((buf (get-buffer-create "*notmuch-mojn-fetch-mail*")))
-    (start-process "notmuch-mojn-fetch-mail" buf "mbsync" "-V" "-a")
-    (view-buffer-other-window buf nil #'kill-buffer)))
+    (make-process
+     :name "notmuch-mojn-fetch-mail"
+     :buffer buf
+     :command '("mbsync" "-V" "-a")
+     :sentinel (lambda (proc change)
+                 (cond
+                  ((string-match "finished" change)
+                   (kill-buffer buf)
+                   (run-hooks 'notmuch-mojn-post-fetch-hook))
+                  ((string-match "\\(exited|failed\\)" change)
+                   (message "%s" change)))))
+    (view-buffer buf #'kill-buffer)))
 
 (defun notmuch-mojn-fetch-mail ()
   "Calls `mbsync' to fetch new mail from the mailserver."
   (interactive)
+  (message "notmuch-mojn: Fetching new mail.")
   (run-hooks 'notmuch-mojn-pre-fetch-hook)
   (funcall notmuch-mojn-fetch-function)
-  (run-hooks 'notmuch-mojn-post-fetch-hook)
-  (notmuch-mojn-refresh))
+  )
 
 (defun notmuch-mojn-delete-mail ()
   "Delete the actual files on disk, for mail tagged with `deleted'."
