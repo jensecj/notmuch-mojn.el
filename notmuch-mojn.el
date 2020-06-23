@@ -1,10 +1,10 @@
-;;; notmuch-mojn.el. --- -*- lexical-binding: t; -*-
+;;; notmuch-mojn.el --- -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019 Jens Christian Jensen
+;; Copyright (C) 2020 Jens Christian Jensen
 
 ;; Author: Jens Christian Jensen <jensecj@gmail.com>
-;; Keywords:
-;; Package-Version: 20200429
+;; Keywords: notmuch, mail
+;; Package-Version: 20200623
 ;; Version: 0.2.0
 
 ;;; Commentary:
@@ -19,7 +19,7 @@
 (require 'notmuch-mojn-core)
 (require 'notmuch-mojn-mute)
 
-;;;; Settings / Vars
+;;;; Settings
 
 (defvar notmuch-mojn-pre-refresh-hook '()
   "Hooks to run before refreshing the notmuch database.")
@@ -84,6 +84,7 @@
         (notmuch-mojn-refresh))
     (message "To delete mail, you need to set `notmuch-mojn-really-delete-mail' to `t'")))
 
+;; TODO: rename notmuch-mojn-refresh to notmuch-mojn-poll? to reflect notmuch.el
 (defun notmuch-mojn-refresh (&optional silent)
   "Calls `notmuch' to refresh the mailbox."
   (interactive)
@@ -98,6 +99,8 @@
         (message "%s" res))))
 
   (run-hooks 'notmuch-mojn-post-refresh-hook))
+
+;;;; UI helpers
 
 (defun notmuch-mojn--build-list-entry (entry)
   "Build a list entry for `tabulated-list-entries' from a
@@ -154,7 +157,7 @@ recounting (un)read mail, etc."
       (ignore-errors
         (revert-buffer)))))
 
-;;;; The Mode
+;;;; Mode setup
 
 (defvar notmuch-mojn-mode-map
   (let ((map (make-sparse-keymap)))

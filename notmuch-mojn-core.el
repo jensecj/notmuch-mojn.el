@@ -1,4 +1,4 @@
-;;; notmuch-mojn-core.el. --- -*- lexical-binding: t; -*-
+;;; notmuch-mojn-core.el --- -*- lexical-binding: t; -*-
 
 (require 'dash)
 (require 's)

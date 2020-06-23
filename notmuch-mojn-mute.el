@@ -1,4 +1,4 @@
-;;; notmuch-mojn-mute.el. --- -*- lexical-binding: t; -*-
+;;; notmuch-mojn-mute.el --- -*- lexical-binding: t; -*-
 
 (require 'dash)
 (require 's)
