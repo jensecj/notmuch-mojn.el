@@ -185,7 +185,7 @@ recounting (un)read mail, etc."
 (defun notmuch-mojn ()
   "Open the `notmuch-mojn' mailbox."
   (interactive)
-  (switch-to-buffer "*notmuch mojn*" nil)
+  (switch-to-buffer notmuch-mojn-buffer-name nil)
   (notmuch-mojn-mode)
 
   (notmuch-mojn-revert-buffer)
