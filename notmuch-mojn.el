@@ -84,7 +84,20 @@
         (notmuch-mojn-refresh))
     (message "To delete mail, you need to set `notmuch-mojn-really-delete-mail' to `t'")))
 
-;;;; UI
+(defun notmuch-mojn-refresh (&optional silent)
+  "Calls `notmuch' to refresh the mailbox."
+  (interactive)
+  (unless silent
+    (message "refreshing notmuch database..."))
+
+  (run-hooks 'notmuch-mojn-pre-refresh-hook)
+
+  (unless (process-live-p (get-process "notmuch-new"))
+    (let ((res (notmuch/cmd "new")))
+      (unless silent
+        (message "%s" res))))
+
+  (run-hooks 'notmuch-mojn-post-refresh-hook))
 
 (defun notmuch-mojn--build-list-entry (entry)
   "Build a list entry for `tabulated-list-entries' from a
@@ -134,29 +147,12 @@ recounting (un)read mail, etc."
 (defun notmuch-mojn-revert-buffer ()
   "Rebuild the buffer, updating entries if something has changed"
   (interactive)
-  (when-let* ((buf (current-buffer))
-              (name (buffer-name buf))
-              (guard (s-starts-with-p "*notmuch" name)))
-    (notmuch-mojn-update-entries)
-    (notmuch-refresh-this-buffer)
-    (ignore-errors
-      (revert-buffer))))
-
-(defun notmuch-mojn-refresh (&optional silent)
-  "Calls `notmuch' to refresh the mailbox."
-  (interactive)
-  (message "refreshing notmuch database...")
-
-  (run-hooks 'notmuch-mojn-pre-refresh-hook)
-
-  (unless (process-live-p (get-process "notmuch-new"))
-    (let ((res (notmuch/cmd "new")))
-      (unless silent
-        (message "%s" res))))
-
-  (run-hooks 'notmuch-mojn-post-refresh-hook)
-
-  (notmuch-mojn-revert-buffer))
+  (when-let ((buf (get-buffer notmuch-mojn-buffer-name)))
+    (with-current-buffer buf
+      (notmuch-mojn-update-entries)
+      (notmuch-refresh-this-buffer)
+      (ignore-errors
+        (revert-buffer)))))
 
 ;;;; The Mode
 
