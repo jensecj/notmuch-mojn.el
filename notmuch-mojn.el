@@ -24,24 +24,27 @@
 (defvar notmuch-mojn-pre-refresh-hook '()
   "Hooks to run before refreshing the notmuch database.")
 
-(defvar notmuch-mojn-post-refresh-hook '(notmuch-mojn-mute-retag-messages)
+(defvar notmuch-mojn-post-refresh-hook '(notmuch-mojn-revert-buffer)
   "Hooks to run after refreshing the notmuch database.")
 
 (defvar notmuch-mojn-pre-fetch-hook '()
   "Hooks to run before fetching new mail.")
 
-(defvar notmuch-mojn-post-fetch-hook '()
+(defvar notmuch-mojn-post-fetch-hook '(notmuch-mojn-refresh)
   "Hooks to run after fetching new mail.")
-
-(defface notmuch-mojn-unread-face
-  '((t (:inherit notmuch-search-unread-face)))
-  "Face used for entries which have unread mails.")
 
 (defvar notmuch-mojn-really-delete-mail nil
   "Whether to really delete email when calling `notmuch-mojn-delete-mail'.")
 
 (defvar notmuch-mojn-fetch-function #'notmuch-mojn--mbsync-fetch-mail
   "Function to use to fetch new mail.")
+
+(defvar notmuch-mojn-buffer-name "*notmuch-mojn*"
+  "Name of the notmuch-mojn buffer.")
+
+(defface notmuch-mojn-unread-face
+  '((t (:inherit notmuch-search-unread-face)))
+  "Face used for entries which have unread mails.")
 
 ;;;; Core
 
