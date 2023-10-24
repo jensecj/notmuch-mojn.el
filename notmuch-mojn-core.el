@@ -88,7 +88,9 @@ We do this by re-using #`notmuch-hello-query-counts', and messing with the searc
 `notmuch' can understand."
   (-map-when
    (lambda (s) (map-elt s :blank))
-   (lambda (s) (map-put! s :query "id:placeholder"))
+   (lambda (s)
+     (map-put! s :query "id:placeholder")
+     s)
    notmuch-saved-searches))
 
 (defun notmuch-mojn-get-saved-searches ()
@@ -121,13 +123,13 @@ by notmuch, and any additional mails collected from
   (interactive)
   (let* ((notmuch-candidates (notmuch-mojn--mail-candidates-notmuch))
          (other-candidates (-mapcat #'funcall notmuch-mojn-candidate-functions))
-         (candidates (remove-duplicates
+         (candidates (cl-remove-duplicates
                       (-concat notmuch-candidates other-candidates)
                       :test #'string=))
          (cand (notmuch-mojn--candidate-at-point))
          (cand-bounds (cdr cand))
          ;; FIXME: figure an API for the completing-read functions, create shims for common ones
-         (pick (funcall notmuch-mojn-completing-read-function "Candidates: " candidates nil t cand)))
+         (pick (funcall notmuch-mojn-completing-read-function "Candidates: " candidates nil t)))
     (when cand-bounds
       (delete-region (car cand-bounds) (cdr cand-bounds))
       (goto-char (car cand-bounds)))
