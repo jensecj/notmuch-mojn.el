@@ -68,10 +68,10 @@
      :sentinel (lambda (proc change)
                  (cond
                   ((string-match "finished" change)
-                   (kill-buffer buf)
+                   (kill-buffer buf);; FIXME: buffer is empty but not killed?
                    (run-hooks 'notmuch-mojn-post-fetch-hook))
                   ((string-match "\\(exited|failed\\)" change)
-                   (message "%s" change)))))
+                   (message "non-zero exit code: %s" change)))))
     (view-buffer buf #'kill-buffer)))
 
 (defun notmuch-mojn--fetch-mail-dwim ()
@@ -196,7 +196,7 @@ recounting (un)read mail, etc."
 (define-derived-mode notmuch-mojn-mode
   tabulated-list-mode "notmuch-mojn"
   "Notmuch hello variant, based on `tabulated-list-mode'."
-  (setq tabulated-list-format [("Key" 5 nil) ("Name" 15 nil) ("Mail" 15 nil)])
+  (setq tabulated-list-format [("Key" 5 nil) ("Name" 20 nil) ("Mail" 20 nil)])
   (setq tabulated-list-padding 2)
   (setq tabulated-list-sort-key nil)
   (tabulated-list-init-header))
