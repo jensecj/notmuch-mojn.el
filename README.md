@@ -2,9 +2,7 @@
 
 Simple alternative to *notmuch-hello.el*
 
-<p align="center">
-<img src="mojn.png?raw=true">
-</p>
+![Notmuch-mojn example image](mojn.png?raw=true "Screenshot of notmuch-mojn in action")
 
 The mode tries to do what you expect, keys correspond to their
 `notmuch-hello` counterparts.
