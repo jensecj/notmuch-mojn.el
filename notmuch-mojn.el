@@ -1,11 +1,12 @@
 ;;; notmuch-mojn.el --- -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020 Jens Christian Jensen
+;; Copyright (C) 2023 Jens C. Jensen
 
-;; Author: Jens Christian Jensen <jensecj@gmail.com>
+;; Author: Jens C. Jensen <dev@mhqv.net>
 ;; Keywords: notmuch, mail
-;; Package-Version: 20200623
-;; Version: 0.2.0
+;; Package-Version: 20231024
+;; Version: 0.2.1
+;; Package-Requires: ((emacs "30.0.50") (dash "2.19.1")  (s "1.13.1"))
 
 ;;; Commentary:
 
