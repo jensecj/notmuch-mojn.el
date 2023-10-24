@@ -62,16 +62,25 @@ list of strings.")
 
 ;;;; Utility
 
-(defun notmuch-mojn--append-unread (queries)
-  "Like `notmuch-hello-query-counts', but add the count of
-unread messages to the plist."
-  (-map
-   (lambda (e)
-     (let* ((query (map-elt e :query))
-            (unread-query (format "count %s and tag:unread" query)))
-       (map-put! e :unread-count
-                 (string-to-number (notmuch/cmd unread-query)))))
-   queries))
+(defun notmuch-mojn--append-unread (searches)
+  "Add the count of unread messages to the plist.
+
+We do this by re-using #`notmuch-hello-query-counts', and messing with the search queries."
+  (let* ((unread-queries
+          (-map
+           (lambda (e)
+             (let* ((c (map-copy e))
+                    (query (map-elt c :query))
+                    (unread-query (format "%s and tag:unread" query)))
+               (plist-put c :query unread-query)))
+           searches))
+         (searches-with-unread-counts (notmuch-hello-query-counts unread-queries :show-empty-searches t)))
+    (-zip-with
+     (lambda (a b)
+       (let ((unread-count (map-elt b :count)))
+         (plist-put a :unread-count unread-count)))
+     searches
+     searches-with-unread-counts)))
 
 ;; HACK: find another way to do this
 (defun notmuch-mojn--clean-saved-searches ()
