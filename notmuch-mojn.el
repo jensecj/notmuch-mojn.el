@@ -152,11 +152,21 @@ recounting (un)read mail, etc."
       (notmuch-search query (not (eq sort-order 'newest-first))))))
 
 (defun notmuch-mojn-search-entry-at-point (&optional tree)
-  "Visit the saved-search entry at point with `notmuch-search'."
+  "View all mails for the saved-search entry at point."
   (interactive)
   (when-let* ((data (notmuch-mojn-get-saved-searches))
               (id (tabulated-list-get-id))
               (entry (nth id data)))
+    (notmuch-mojn-search-entry entry tree)))
+
+(defun notmuch-mojn-search-unread-entry-at-point (&optional tree)
+  "View all unread mails for the saved-search entry at point."
+  (interactive)
+  (when-let* ((data (notmuch-mojn-get-saved-searches))
+              (id (tabulated-list-get-id))
+              (entry (nth id data))
+              (q (map-elt entry :query)))
+    (map-put! entry :query (concat q " and tag:unread"))
     (notmuch-mojn-search-entry entry tree)))
 
 (defun notmuch-mojn-tree-entry-at-point ()
@@ -185,6 +195,7 @@ recounting (un)read mail, etc."
     (define-key map (kbd "m") #'notmuch-mua-new-mail)
     ;; mojn specific keys
     (define-key map (kbd "<return>") #'notmuch-mojn-search-entry-at-point)
+    (define-key map (kbd "C-<return>") #'notmuch-mojn-search-unread-entry-at-point)
     (define-key map (kbd "z") #'notmuch-mojn-tree-entry-at-point)
     (define-key map (kbd "g") #'notmuch-mojn-revert-buffer)
     (define-key map (kbd "u") #'notmuch-mojn-refresh)
