@@ -37,25 +37,34 @@
 (defvar notmuch-mojn-really-delete-mail nil
   "Whether to really delete email when calling `notmuch-mojn-delete-mail'.")
 
-(defvar notmuch-mojn-fetch-function #'notmuch-mojn--mbsync-fetch-mail
+(defvar notmuch-mojn-fetch-function #'notmuch-mojn--fetch-mail-dwim
   "Function to use to fetch new mail.")
 
-(defvar notmuch-mojn-buffer-name "*notmuch-mojn*"
+(defvar notmuch-mojn-buffer "*notmuch-mojn*"
   "Name of the notmuch-mojn buffer.")
+
+(defvar notmuch-mojn-fetch-buffer "*notmuch-mojn-fetch-mail*"
+  "Name of the buffer used by notmuch-mojn to fetch mail.")
 
 (defface notmuch-mojn-unread-face
   '((t (:inherit notmuch-search-unread-face)))
   "Face used for entries which have unread mails.")
 
+(defvar notmuch-mojn-fetch-command '("mbsync" "-q" "-V")
+  "Command used to fetch new mail.")
+
+(defvar notmuch-mojn-accounts-alist '((all . "-a"))
+  "Alist of (MAIL ACCOUNT . ARG) for")
+
 ;;;; Core
 
-(defun notmuch-mojn--mbsync-fetch-mail ()
-  "Fetch new mail using mbsync."
-  (let ((buf (get-buffer-create "*notmuch-mojn-fetch-mail*")))
+(defun notmuch-mojn--fetch-mail (command)
+  "Fetch new mail by shelling out to COMMAND."
+  (let ((buf (get-buffer-create notmuch-mojn-fetch-buffer)))
     (make-process
      :name "notmuch-mojn-fetch-mail"
      :buffer buf
-     :command '("mbsync" "-V" "-a")
+     :command command
      :sentinel (lambda (proc change)
                  (cond
                   ((string-match "finished" change)
@@ -65,13 +74,20 @@
                    (message "%s" change)))))
     (view-buffer buf #'kill-buffer)))
 
+(defun notmuch-mojn--fetch-mail-dwim ()
+  (when-let ((pick (completing-read "account: "
+                                    (mapcar #'car notmuch-mojn-accounts-alist)
+                                    nil t)))
+    (notmuch-mojn--fetch-mail
+     (-snoc notmuch-mojn-fetch-command
+            (alist-get pick notmuch-mojn-accounts-alist nil nil #'string=)))))
+
 (defun notmuch-mojn-fetch-mail ()
-  "Calls `mbsync' to fetch new mail from the mailserver."
+  "Calls `notmuch-mojn-fetch-function' to fetch new mail from the mailserver."
   (interactive)
   (message "notmuch-mojn: Fetching new mail.")
   (run-hooks 'notmuch-mojn-pre-fetch-hook)
-  (funcall notmuch-mojn-fetch-function)
-  )
+  (funcall notmuch-mojn-fetch-function))
 
 (defun notmuch-mojn-delete-mail ()
   "Delete the actual files on disk, for mail tagged with `deleted'."
@@ -151,7 +167,7 @@ recounting (un)read mail, etc."
 (defun notmuch-mojn-revert-buffer ()
   "Rebuild the buffer, updating entries if something has changed"
   (interactive)
-  (when-let ((buf (get-buffer notmuch-mojn-buffer-name)))
+  (when-let ((buf (get-buffer notmuch-mojn-buffer)))
     (with-current-buffer buf
       (notmuch-mojn-update-entries)
       (notmuch-refresh-this-buffer)
@@ -187,9 +203,9 @@ recounting (un)read mail, etc."
 
 ;;;###autoload
 (defun notmuch-mojn ()
-  "Open the `notmuch-mojn' mailbox."
+  "Open the `notmuch-mojn' dashboard."
   (interactive)
-  (switch-to-buffer notmuch-mojn-buffer-name nil)
+  (switch-to-buffer notmuch-mojn-buffer nil)
   (notmuch-mojn-mode)
 
   (notmuch-mojn-revert-buffer)
